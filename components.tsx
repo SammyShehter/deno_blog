@@ -22,7 +22,17 @@ interface IndexProps {
   posts: Map<string, Post>;
 }
 
+export function Admin() {
+  return (
+    <h2>
+      Hi!
+    </h2>
+  )
+}
+
 export function Index({ state, posts }: IndexProps) {
+  console.log(state, posts);
+  
   const postIndex = [];
   for (const [_key, post] of posts.entries()) {
     postIndex.push(post);
