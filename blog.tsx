@@ -26,7 +26,7 @@ import {
     UnoCSS,
     walk,
 } from "./deps.ts"
-import { Index, PostPage, Admin } from "./components.tsx"
+import { Index, PostPage } from "./components.tsx"
 import type { ConnInfo, FeedItem } from "./deps.ts"
 import type {
     BlogContext,
@@ -336,28 +336,10 @@ export async function handler(req: Request, ctx: BlogContext) {
                 <Index
                     state={blogState}
                     posts={preparePosts(POSTS, searchParams, +page)}
+                    postsAmount={[...POSTS.entries()].length}
+                    currentPage = {+page}
                 />
             ),
-        })
-    }
-    if (pathname === "/admin") {
-        return html({
-            ...sharedHtmlOptions,
-            title: blogState.title ?? "My Blog",
-            meta: {
-                description: blogState.description,
-                "og:title": blogState.title,
-                "og:description": blogState.description,
-                "og:image": blogState.ogImage ?? blogState.cover,
-                "twitter:title": blogState.title,
-                "twitter:description": blogState.description,
-                "twitter:image": blogState.ogImage ?? blogState.cover,
-                "twitter:card": blogState.ogImage
-                    ? "summary_large_image"
-                    : undefined,
-            },
-            styles: [...(blogState.style ? [blogState.style] : [])],
-            body: <Admin />,
         })
     }
 

@@ -20,10 +20,30 @@ const socialAppIcons = new Map([
 interface IndexProps {
   state: BlogState;
   posts: Array<Post>;
+  postsAmount:number;
+  currentPage: number;
 }
 
-export function Index({ state, posts }: IndexProps) {
-  
+interface PaginationProps {
+  currentPage: number;
+   pagesAmount:number;
+}
+
+interface DirectionProps {
+  way: string;
+  page: number;
+}
+
+interface PaginationPageProps {
+  pageNumber: number
+  middle:boolean
+  disable: boolean
+}
+
+export function Index({ state, posts, postsAmount, currentPage }: IndexProps) {
+  const perPage = 5
+  currentPage = +currentPage ?? 1
+  const pagesAmount = Math.round(postsAmount / perPage) + 1
   return (
     <div class="home">
       {state.header || (
@@ -107,13 +127,86 @@ export function Index({ state, posts }: IndexProps) {
             />
           ))}
         </div>
-
+        <Pagination currentPage={currentPage} pagesAmount={pagesAmount}/>
         {state.footer || <Footer author={state.author} />}
       </div>
     </div>
   );
 }
 
+function PaginationPage ({pageNumber, middle, disable}: PaginationPageProps) {
+  return (
+    <a
+        href={`?page=${pageNumber}`}
+        class={`${middle ? "": "hidden "} ${disable ? "pointer-events-none bg-indigo-50 border-indigo-500 text-indigo-600 ": "bg-white border-gray-300 text-gray-500 hover:bg-gray-50 "}relative inline-flex items-center px-4 py-2 border text-sm font-medium`}
+    >
+        {" "}
+        {pageNumber}{" "}
+    </a>
+)
+}
+
+function Pagination({currentPage, pagesAmount}: PaginationProps) {
+
+
+    function preparePagPages (pagesAmount: number) {
+      const pages = []
+      for (let current = 1; current < pagesAmount; current++) {
+        if(current === (pagesAmount+1)/2){
+          pages.push(<span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"> ... </span>)
+        }
+        pages.push(<PaginationPage pageNumber={current} middle={!!Math.round(pagesAmount / 2)} disable={current === currentPage}/>)
+      }
+      return pages
+    }
+    preparePagPages(pagesAmount)
+    return (
+        <div class="flex mx-auto max-w-screen-sm pt-12">
+            <nav
+                class="inline-flex rounded-md shadow-sm mx-auto"
+                aria-label="Pagination"
+            >
+              <Direction way="Previous" page={currentPage-1} />
+              {preparePagPages(pagesAmount)}
+              <Direction way="Next" page={currentPage+1} />
+            </nav>
+        </div>
+    )
+}
+
+function Direction({ way, page }: DirectionProps) {
+    return (
+        <a
+            href={`?page=${page}`}
+            class={
+              `${way === "Next" ?
+              "rounded-r-md " : "rounded-l-md "}
+              relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50
+              `
+          }
+        >
+            <span class="sr-only">{way}</span>
+            <svg
+                class="h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+            >
+                <path
+                    fill-rule="evenodd"
+                    d={
+                        way === "Next"
+                            ? "M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                            : "M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                    }
+                    clip-rule="evenodd"
+                />
+            </svg>
+        </a>
+    )
+}
+  
 function PostCard(
   { post, dateStyle, lang }: {
     post: Post;
