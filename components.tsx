@@ -32,11 +32,11 @@ interface PaginationProps {
 interface DirectionProps {
   way: string;
   page: number;
+  limit: number;
 }
 
 interface PaginationPageProps {
   pageNumber: number
-  middle:boolean
   disable: boolean
 }
 
@@ -134,11 +134,11 @@ export function Index({ state, posts, postsAmount, currentPage }: IndexProps) {
   );
 }
 
-function PaginationPage ({pageNumber, middle, disable}: PaginationPageProps) {
+function PaginationPage ({pageNumber, disable}: PaginationPageProps) {
   return (
     <a
         href={`?page=${pageNumber}`}
-        class={`${middle ? "": "hidden "} ${disable ? "pointer-events-none bg-indigo-50 border-indigo-500 text-indigo-600 ": "bg-white border-gray-300 text-gray-500 hover:bg-gray-50 "}relative inline-flex items-center px-4 py-2 border text-sm font-medium`}
+        class={`${disable ? "pointer-events-none bg-indigo-50 border-indigo-500 text-indigo-600 ": "bg-white border-gray-300 text-gray-500 hover:bg-gray-50 "}relative inline-flex items-center px-4 py-2 border text-sm font-medium`}
     >
         {" "}
         {pageNumber}{" "}
@@ -152,10 +152,22 @@ function Pagination({currentPage, pagesAmount}: PaginationProps) {
     function preparePagPages (pagesAmount: number) {
       const pages = []
       for (let current = 1; current < pagesAmount; current++) {
-        if(current === (pagesAmount+1)/2){
-          pages.push(<span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"> ... </span>)
+        if(pagesAmount < 7) {
+          pages.push(<PaginationPage pageNumber={current} disable={current === currentPage}/>)
+          continue
         }
-        pages.push(<PaginationPage pageNumber={current} middle={!!Math.round(pagesAmount / 2)} disable={current === currentPage}/>)
+
+        const firstThird = current <= 3
+        const lastTwo = current >= pagesAmount - 2
+
+        if(current === Math.floor(pagesAmount/2)){
+          pages.push(<span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"> ... </span>)
+          continue
+        }
+        if(firstThird || lastTwo) {
+          pages.push(<PaginationPage pageNumber={current} disable={current === currentPage}/>)
+        }
+        continue
       }
       return pages
     }
@@ -166,20 +178,20 @@ function Pagination({currentPage, pagesAmount}: PaginationProps) {
                 class="inline-flex rounded-md shadow-sm mx-auto"
                 aria-label="Pagination"
             >
-              <Direction way="Previous" page={currentPage-1} />
+              <Direction way="Previous" page={currentPage-1} limit={0} />
               {preparePagPages(pagesAmount)}
-              <Direction way="Next" page={currentPage+1} />
+              <Direction way="Next" page={currentPage+1} limit={pagesAmount}/>
             </nav>
         </div>
     )
 }
 
-function Direction({ way, page }: DirectionProps) {
+function Direction({ way, page, limit }: DirectionProps) {
     return (
         <a
             href={`?page=${page}`}
             class={
-              `${way === "Next" ?
+              `${limit >= page && limit <= page ? "pointer-events-none ": ""}${way === "Next" ?
               "rounded-r-md " : "rounded-l-md "}
               relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50
               `
