@@ -1,11 +1,11 @@
 ---
-title: Second post
+title: Thirteenth post
 author: Sammy Shehter
-publish_date: 2022-05-02
-abstract: This is the second post.
+publish_date: 2022-05-06
+abstract: This is the Thirteenth post.
 ---
 
-<img src="second/hello2.png"/>
+<img src="media/2/hello2.png"/>
 
 Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
 Ipsum has been the industry's standard dummy text ever since the 1500s, when an

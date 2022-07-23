@@ -19,28 +19,11 @@ const socialAppIcons = new Map([
 
 interface IndexProps {
   state: BlogState;
-  posts: Map<string, Post>;
-}
-
-export function Admin() {
-  return (
-    <h2>
-      Hi!
-    </h2>
-  )
+  posts: Array<Post>;
 }
 
 export function Index({ state, posts }: IndexProps) {
-  console.log(state, posts);
   
-  const postIndex = [];
-  for (const [_key, post] of posts.entries()) {
-    postIndex.push(post);
-  }
-  postIndex.sort(
-    (a, b) => (b.publishDate?.getTime() ?? 0) - (a.publishDate?.getTime() ?? 0),
-  );
-
   return (
     <div class="home">
       {state.header || (
@@ -115,7 +98,7 @@ export function Index({ state, posts }: IndexProps) {
 
       <div class="max-w-screen-sm px-6 mx-auto">
         <div class="pt-16 lt-sm:pt-12 border-t-1 border-gray-300/80">
-          {postIndex.map((post) => (
+          {posts.map((post) => (
             <PostCard
               post={post}
               key={post.pathname}

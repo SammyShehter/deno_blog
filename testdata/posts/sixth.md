@@ -1,7 +1,7 @@
 ---
-title: First post
-publish_date: 2022-03-20
-abstract: This is the first post.
+title: Sixth post
+publish_date: 2022-03-25
+abstract: This is the Sixth post.
 cover_html: <svg class="w-full" height="350" width="100%" background="black"><circle cx="50%" cy="170" r="150" stroke="white" stroke-width="10" fill="black" alpha="50%"/></svg>
 ---
 
@@ -9,7 +9,7 @@ It was popularised in the 1960s with the release of Letraset sheets containing
 Lorem Ipsum passages, and more recently with desktop publishing software like
 Aldus PageMaker including versions of Lorem Ipsum.
 
-<img src="first/hello.png"/>
+<img src="media/1/hello.png"/>
 
 Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
 Ipsum has been the industry's standard dummy text ever since the 1500s, when an

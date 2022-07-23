@@ -194,6 +194,17 @@ async function loadContent(blogDirectory: string, isDev: boolean) {
     }
 }
 
+function sortPostsByDate(postsMap: Map<string, Post>) {
+    const postIndex = [];
+    for (const [_key, post] of postsMap.entries()) {
+      postIndex.push(post);
+    }
+    return postIndex.sort(
+      (a, b) => (b.publishDate?.getTime() ?? 0) - (a.publishDate?.getTime() ?? 0),
+    );
+  
+}
+
 // Watcher watches for .md file changes and updates the posts.
 async function watchForChanges(postsDirectory: string) {
     const watcher = Deno.watchFs(postsDirectory)
@@ -303,6 +314,8 @@ export async function handler(req: Request, ctx: BlogContext) {
     }
 
     if (pathname === "/") {
+        const page = searchParams.get("page") ?? 1
+        
         return html({
             ...sharedHtmlOptions,
             title: blogState.title ?? "My Blog",
@@ -322,7 +335,7 @@ export async function handler(req: Request, ctx: BlogContext) {
             body: (
                 <Index
                     state={blogState}
-                    posts={filterPosts(POSTS, searchParams)}
+                    posts={preparePosts(POSTS, searchParams, +page)}
                 />
             ),
         })
@@ -497,7 +510,30 @@ export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
     }
 }
 
-function filterPosts(posts: Map<string, Post>, searchParams: URLSearchParams) {
+function preparePosts(posts: Map<string, Post>, searchParams: URLSearchParams, page: number): Array<Post>{
+    const filteredPosts = filterPosts(posts, searchParams)
+    const sortedPosts = sortPostsByDate(filteredPosts)
+    return paginatedPosts(sortedPosts, page)
+
+function paginatedPosts(sortedPosts: Post[], page: number) {
+    const perPage = 5
+    const postsAmount = sortedPosts.length
+    const outOfRange = page*perPage >= postsAmount && postsAmount > (page - 1)*perPage
+	const validRange = postsAmount > page * perPage
+    
+	if (outOfRange) {
+		return sortedPosts.slice(perPage * (page - 1), postsAmount)
+	}
+    
+    if (validRange) {
+		return sortedPosts.slice(perPage * (page - 1), perPage*(page))
+	}
+
+    return sortedPosts.slice(0, perPage)
+}
+}
+
+function filterPosts(posts: Map<string, Post>, searchParams: URLSearchParams): Map<string, Post> {
     const tag = searchParams.get("tag")
     if (!tag) {
         return posts
