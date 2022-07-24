@@ -43,7 +43,7 @@ interface PaginationPageProps {
 export function Index({ state, posts, postsAmount, currentPage }: IndexProps) {
   const perPage = 5
   currentPage = +currentPage ?? 1
-  const pagesAmount = Math.round(postsAmount / perPage) + 1
+  const pagesAmount = Math.ceil(postsAmount / perPage)
   return (
     <div class="home">
       {state.header || (
@@ -127,7 +127,7 @@ export function Index({ state, posts, postsAmount, currentPage }: IndexProps) {
             />
           ))}
         </div>
-        <Pagination currentPage={currentPage} pagesAmount={pagesAmount}/>
+        {pagesAmount > 1 && <Pagination currentPage={currentPage} pagesAmount={pagesAmount}/>}
         {state.footer || <Footer author={state.author} />}
       </div>
     </div>
@@ -151,7 +151,7 @@ function Pagination({currentPage, pagesAmount}: PaginationProps) {
 
     function preparePagPages (pagesAmount: number) {
       const pages = []
-      for (let current = 1; current < pagesAmount; current++) {
+      for (let current = 1; current <= pagesAmount; current++) {
         if(pagesAmount < 7) {
           pages.push(<PaginationPage pageNumber={current} disable={current === currentPage}/>)
           continue
@@ -180,7 +180,7 @@ function Pagination({currentPage, pagesAmount}: PaginationProps) {
             >
               <Direction way="Previous" page={currentPage-1} limit={0} />
               {preparePagPages(pagesAmount)}
-              <Direction way="Next" page={currentPage+1} limit={pagesAmount}/>
+              <Direction way="Next" page={currentPage+1} limit={pagesAmount+1}/>
             </nav>
         </div>
     )
