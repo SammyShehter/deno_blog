@@ -336,7 +336,7 @@ export async function handler(req: Request, ctx: BlogContext) {
                 <Index
                     state={blogState}
                     posts={preparePosts(POSTS, searchParams, +page)}
-                    postsAmount={[...POSTS.entries()].length}
+                    postsAmount={POSTS.size}
                     currentPage = {+page}
                 />
             ),
