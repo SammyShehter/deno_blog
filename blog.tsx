@@ -244,7 +244,7 @@ async function loadPost(postsDirectory: string, path: string) {
     if (!snippet) {
         const maybeSnippet = content.split("\n\n")[0]
         if (maybeSnippet) {
-            snippet = removeMarkdown(maybeSnippet.replace("\n", " "))
+            snippet = removeMarkdown(maybeSnippet.replace("\n", " "))            
         } else {
             snippet = ""
         }
@@ -496,6 +496,7 @@ function preparePosts(posts: Map<string, Post>, searchParams: URLSearchParams, p
     const filteredPosts = filterPosts(posts, searchParams)
     const sortedPosts = sortPostsByDate(filteredPosts)
     return paginatedPosts(sortedPosts, page)
+}
 
 function paginatedPosts(sortedPosts: Post[], page: number) {
     const perPage = 5
@@ -512,7 +513,6 @@ function paginatedPosts(sortedPosts: Post[], page: number) {
 	}
 
     return sortedPosts.slice(0, perPage)
-}
 }
 
 function filterPosts(posts: Map<string, Post>, searchParams: URLSearchParams): Map<string, Post> {

@@ -171,7 +171,6 @@ function Pagination({currentPage, pagesAmount}: PaginationProps) {
       }
       return pages
     }
-    preparePagPages(pagesAmount)
     return (
         <div class="flex mx-auto max-w-screen-sm pt-12">
             <nav
