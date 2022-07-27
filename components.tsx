@@ -19,18 +19,31 @@ const socialAppIcons = new Map([
 
 interface IndexProps {
   state: BlogState;
-  posts: Map<string, Post>;
+  posts: Array<Post>;
+  postsAmount:number;
+  currentPage: number;
 }
 
-export function Index({ state, posts }: IndexProps) {
-  const postIndex = [];
-  for (const [_key, post] of posts.entries()) {
-    postIndex.push(post);
-  }
-  postIndex.sort(
-    (a, b) => (b.publishDate?.getTime() ?? 0) - (a.publishDate?.getTime() ?? 0),
-  );
+interface PaginationProps {
+  currentPage: number;
+   pagesAmount:number;
+}
 
+interface DirectionProps {
+  way: string;
+  page: number;
+  limit: number;
+}
+
+interface PaginationPageProps {
+  pageNumber: number
+  disable: boolean
+}
+
+export function Index({ state, posts, postsAmount, currentPage }: IndexProps) {
+  const perPage = 5
+  currentPage = +currentPage ?? 1
+  const pagesAmount = Math.ceil(postsAmount / perPage)
   return (
     <div class="home">
       {state.header || (
@@ -105,7 +118,7 @@ export function Index({ state, posts }: IndexProps) {
 
       <div class="max-w-screen-sm px-6 mx-auto">
         <div class="pt-16 lt-sm:pt-12 border-t-1 border-gray-300/80">
-          {postIndex.map((post) => (
+          {posts.map((post) => (
             <PostCard
               post={post}
               key={post.pathname}
@@ -114,13 +127,97 @@ export function Index({ state, posts }: IndexProps) {
             />
           ))}
         </div>
-
+        {pagesAmount > 1 && <Pagination currentPage={currentPage} pagesAmount={pagesAmount}/>}
         {state.footer || <Footer author={state.author} />}
       </div>
     </div>
   );
 }
 
+function PaginationPage ({pageNumber, disable}: PaginationPageProps) {
+  return (
+    <a
+        href={`?page=${pageNumber}`}
+        class={`${disable ? "pointer-events-none bg-indigo-50 border-indigo-500 text-indigo-600 ": "bg-white border-gray-300 text-gray-500 hover:bg-gray-50 "}relative inline-flex items-center px-4 py-2 border text-sm font-medium`}
+    >
+        {" "}
+        {pageNumber}{" "}
+    </a>
+)
+}
+
+function Pagination({currentPage, pagesAmount}: PaginationProps) {
+
+
+    function preparePagPages (pagesAmount: number) {
+      const pages = []
+      for (let current = 1; current <= pagesAmount; current++) {
+        if(pagesAmount < 7) {
+          pages.push(<PaginationPage pageNumber={current} disable={current === currentPage}/>)
+          continue
+        }
+
+        const firstThird = current <= 3
+        const lastTwo = current >= pagesAmount - 2
+
+        if(current === Math.floor(pagesAmount/2)){
+          pages.push(<span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"> ... </span>)
+          continue
+        }
+        if(firstThird || lastTwo) {
+          pages.push(<PaginationPage pageNumber={current} disable={current === currentPage}/>)
+        }
+        continue
+      }
+      return pages
+    }
+    return (
+        <div class="flex mx-auto max-w-screen-sm pt-12">
+            <nav
+                class="inline-flex rounded-md shadow-sm mx-auto"
+                aria-label="Pagination"
+            >
+              <Direction way="Previous" page={currentPage-1} limit={0} />
+              {preparePagPages(pagesAmount)}
+              <Direction way="Next" page={currentPage+1} limit={pagesAmount+1}/>
+            </nav>
+        </div>
+    )
+}
+
+function Direction({ way, page, limit }: DirectionProps) {
+    return (
+        <a
+            href={`?page=${page}`}
+            class={
+              `${limit >= page && limit <= page ? "pointer-events-none ": ""}${way === "Next" ?
+              "rounded-r-md " : "rounded-l-md "}
+              relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50
+              `
+          }
+        >
+            <span class="sr-only">{way}</span>
+            <svg
+                class="h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+            >
+                <path
+                    fill-rule="evenodd"
+                    d={
+                        way === "Next"
+                            ? "M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                            : "M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                    }
+                    clip-rule="evenodd"
+                />
+            </svg>
+        </a>
+    )
+}
+  
 function PostCard(
   { post, dateStyle, lang }: {
     post: Post;

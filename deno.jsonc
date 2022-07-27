@@ -1,5 +1,6 @@
 {
   "tasks": {
+    "dev": "deno run  --allow-net --allow-read --allow-env=NODE_DEBUG --watch --no-check testdata/my_blog.ts --dev",
     "start": "deno run  --allow-net --allow-read --allow-env=NODE_DEBUG --no-check testdata/my_blog.ts",
     "test": "deno test --no-check=remote --allow-read"
   }
