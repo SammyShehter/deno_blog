@@ -1,0 +1,1 @@
+export const getRandNumber = (length = 10): number => Math.round(Math.random()*length)

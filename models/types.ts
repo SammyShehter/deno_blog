@@ -1,0 +1,1 @@
+export type DateStyle = "full" | "long" | "medium" | "short";
